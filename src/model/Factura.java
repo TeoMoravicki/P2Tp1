@@ -6,12 +6,12 @@ import java.util.Date;
 import java.util.List;
 
 public class Factura {
-    private String numero;
-    private Date fechaEmision;
-    private Cliente cliente;
-    private Empleado empleado;
-    private List<ItemComercial> items;
-    private FormaPago formaPago;
+    private final String numero;
+    private final Date fechaEmision;
+    private final Cliente cliente;
+    private final Empleado empleado;
+    private final List<ItemComercial> items;
+    private final FormaPago formaPago;
     private Pago pago;
 
     public Factura(String numero, Date fechaEmision, Cliente cliente,

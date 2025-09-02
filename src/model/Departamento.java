@@ -10,6 +10,10 @@ public class Departamento {
         this.responsable = responsable;
     }
 
+    public void setResponsable(Empleado responsable) {
+        this.responsable = responsable;
+    }
+
     public String getNombre() { return nombre; }
     public double getPresupuesto() { return presupuesto; }
     public Empleado getResponsable() { return responsable; }
