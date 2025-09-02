@@ -4,10 +4,10 @@ import enums.FormaPago;
 
 import java.util.Date;
 public class Pago {
-    private double monto;
-    private Date fecha;
-    private FormaPago formaPago;
-    private EstadoPago estado;
+    private final double monto;
+    private final Date fecha;
+    private final FormaPago formaPago;
+    private final EstadoPago estado;
 
     public Pago(double monto, Date fecha, FormaPago formaPago, EstadoPago estado) {
         this.monto = monto;
