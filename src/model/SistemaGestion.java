@@ -1,6 +1,7 @@
+package model;
+
 import java.util.*;
 import enums.*;
-import model.*;
 
 public class SistemaGestion {
     private List<Departamento> departamentos;

@@ -3,40 +3,47 @@ package services;
 import enums.TipoProductoServicio;
 import model.Proveedor;
 import model.Servicio;
+import model.SistemaGestion;
 
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-public class Servicio_service {
-    private static Scanner scanner;
-    public static void gestionarServicios() {
+public class ServicioService {
+    private final SistemaGestion sistema;
+    private final Scanner scanner;
+
+    public ServicioService(SistemaGestion sistema, Scanner scanner) {
+        this.sistema = sistema;
+        this.scanner = scanner;
+    }
+
+    public void gestionar() {
         int opcion = -1;
         while (opcion != 0) {
             System.out.println("\n--- GESTIÓN DE SERVICIOS ---");
             System.out.println("1. Crear servicio");
             System.out.println("2. Listar servicios");
-            System.out.println("0. Volver al menú principal");
+            System.out.println("0. Volver");
             System.out.print("Seleccione una opción: ");
 
-            opcion = scanner.nextInt();
-            scanner.nextLine();
+            try {
+                opcion = scanner.nextInt();
+                scanner.nextLine();
 
-            switch (opcion) {
-                case 1:
-                    crearServicio();
-                    break;
-                case 2:
-                    listarServicios();
-                    break;
-                case 0:
-                    break;
-                default:
-                    System.out.println("Opción no válida.");
+                switch (opcion) {
+                    case 1 -> crear();
+                    case 2 -> listar();
+                    case 0 -> { /* volver */ }
+                    default -> System.out.println("Opción no válida.");
+                }
+            } catch (InputMismatchException e) {
+                System.out.println("Por favor, ingrese un número válido.");
+                scanner.nextLine();
             }
         }
     }
 
-    private void crearServicio() {
+    public void crear() {
         System.out.println("\n--- CREAR NUEVO SERVICIO ---");
 
         if (sistema.getProveedores().isEmpty()) {
@@ -54,9 +61,8 @@ public class Servicio_service {
             double precio = scanner.nextDouble();
             scanner.nextLine();
 
-            // Seleccionar tipo
-            System.out.println("Seleccione el tipo:");
             TipoProductoServicio[] tipos = TipoProductoServicio.values();
+            System.out.println("Seleccione el tipo:");
             for (int i = 0; i < tipos.length; i++) {
                 System.out.println((i + 1) + ". " + tipos[i]);
             }
@@ -65,26 +71,27 @@ public class Servicio_service {
             scanner.nextLine();
             TipoProductoServicio tipo = tipos[tipoIndex];
 
-            // Seleccionar proveedor
             System.out.println("Seleccione el proveedor:");
             for (int i = 0; i < sistema.getProveedores().size(); i++) {
                 System.out.println((i + 1) + ". " + sistema.getProveedores().get(i).getNombre());
             }
             System.out.print("Seleccione el número del proveedor: ");
-            int proveedorIndex = scanner.nextInt() - 1;
+            int proveedorIndex = scanner.nextInt() - 1; // ahora lo paso a 0-based
             scanner.nextLine();
             Proveedor proveedor = sistema.getProveedores().get(proveedorIndex);
 
             Servicio nuevoServicio = new Servicio(codigo, nombre, precio, tipo, proveedor);
             sistema.agregarServicio(nuevoServicio);
             System.out.println("Servicio creado exitosamente.");
-        } catch(InputMismatchException e){
+        } catch (InputMismatchException e) {
             System.out.println("Por favor, ingrese algo válido.");
             scanner.nextLine(); // Limpiar buffer
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("Opción fuera de rango.");
         }
     }
 
-    private void listarServicios() {
+    public void listar() {
         System.out.println("\n--- LISTA DE SERVICIOS ---");
         if (sistema.getServicios().isEmpty()) {
             System.out.println("No hay servicios registrados.");
@@ -99,5 +106,5 @@ public class Servicio_service {
                     " - Proveedor: " + s.getProveedor().getNombre());
         }
     }
-
 }
+
