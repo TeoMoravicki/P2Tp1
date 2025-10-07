@@ -18,9 +18,19 @@ public class Empleado extends Persona {
         this.departamento = departamento;
     }
 
-
     public double getSalario() { return salario; }
     public PuestoEmpleado getPuesto() { return puesto; }
     public Date getFechaIngreso() { return fechaIngreso; }
     public Departamento getDepartamento() { return departamento; }
+
+    // Setters añadidos para permitir edición en sitio
+    public void setSalario(double salario) { this.salario = salario; }
+    public void setPuesto(PuestoEmpleado puesto) { this.puesto = puesto; }
+    public void setFechaIngreso(Date fechaIngreso) { this.fechaIngreso = fechaIngreso; }
+    public void setDepartamento(Departamento departamento) { this.departamento = departamento; }
+
+    @Override
+    public String toString() {
+        return nombre;
+    }
 }

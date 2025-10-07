@@ -88,8 +88,6 @@ public class ReciboFacturaPdf implements DocumentoImprimible {
                     y -= leading / 2;
                     write(cs, x, y, FONT_TEXT, 12, "============================="); y -= leading;
                     write(cs, x, y, FONT_TEXT, 12, "Subtotal: $" + money(factura.calcularSubtotal())); y -= leading;
-                    write(cs, x, y, FONT_TEXT, 12, "IVA (21%): $" + money(factura.calcularImpuestos())); y -= leading;
-                    // ya tenés:
                     write(cs, x, y, FONT_TEXT, 12, "IVA (21%): $" + money(factura.calcularSubtotal() * 0.21)); y -= leading;
                     if (factura.getImpuestoExtra() > 0) {
                         double extraAmt = factura.calcularSubtotal() * (factura.getImpuestoExtra() / 100.0);

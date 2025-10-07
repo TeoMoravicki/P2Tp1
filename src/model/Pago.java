@@ -21,8 +21,21 @@ public class Pago {
     public void setMonto(double monto) { this.monto = monto; }
 
     public Date getFecha() { return fecha; }
+    public void setFecha(Date fecha) { this.fecha = fecha; }            // <-- agregado
+
     public FormaPago getFormaPago() { return formaPago; }
+    public void setFormaPago(FormaPago formaPago) { this.formaPago = formaPago; } // <-- agregado
 
     public EstadoPago getEstado() { return estado; }
     public void setEstado(EstadoPago estado) { this.estado = estado; }
+
+    @Override
+    public String toString() {
+        return "Pago{" +
+                "monto=" + monto +
+                ", fecha=" + fecha +
+                ", formaPago=" + formaPago +
+                ", estado=" + estado +
+                '}';
+    }
 }

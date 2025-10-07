@@ -17,4 +17,9 @@ abstract class Persona {
     public String getDomicilio() { return domicilio; }
     public String getDni() { return dni; }
     public String getTelefono() { return telefono; }
+
+    // Setters añadidos para permitir editar nombre, domicilio y teléfono desde diálogos
+    public void setNombre(String nombre) { this.nombre = nombre; }
+    public void setDomicilio(String domicilio) { this.domicilio = domicilio; }
+    public void setTelefono(String telefono) { this.telefono = telefono; }
 }
