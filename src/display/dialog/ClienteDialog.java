@@ -116,7 +116,7 @@ public class ClienteDialog extends JDialog {
                     );
                     sistema.agregarCliente(clienteGuardar);
                 } else {
-                    // Edición in-place usando setters (mantiene referencias)
+                    // Edición in-place usando setters
                     cliente.setNombre(txtNombre.getText().trim());
                     cliente.setDomicilio(txtDomicilio.getText().trim());
                     // DNI no se modifica

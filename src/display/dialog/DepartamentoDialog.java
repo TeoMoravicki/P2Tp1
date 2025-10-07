@@ -79,8 +79,8 @@ public class DepartamentoDialog extends JDialog {
         formPanel.add(cmbResponsable, gbc);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JButton btnGuardar = crearBoton("💾 Guardar", Color.decode("#2E8B57"));
-        JButton btnCancelar = crearBoton("❌ Cancelar", Color.decode("#DC143C"));
+        JButton btnGuardar = crearBoton("Guardar", Color.decode("#2E8B57"));
+        JButton btnCancelar = crearBoton("Cancelar", Color.decode("#DC143C"));
 
         btnGuardar.addActionListener(e -> {
             if (validarFormulario()) {
@@ -116,7 +116,7 @@ public class DepartamentoDialog extends JDialog {
                 }
             }
         }
-        // opcional: bloquear edición del nombre si querés (descomentar)
+        // opcional: bloquear edición del nombre
         // txtNombre.setEditable(false);
     }
 
@@ -158,26 +158,25 @@ public class DepartamentoDialog extends JDialog {
         double presupuesto = Double.parseDouble(txtPresupuesto.getText().trim());
         Empleado responsable = (Empleado) cmbResponsable.getSelectedItem();
 
-        Departamento nuevo = new Departamento(nombre, presupuesto, responsable);
-
         if (departamento == null) {
-            // creación
+            // CREACIÓN: creamos y agregamos, luego sincronizamos responsable
+            Departamento nuevo = new Departamento(nombre, presupuesto, responsable);
             sistema.agregarDepartamento(nuevo);
+
+            // Asegura que el empleado responsable apunte a este departamento
+            sistema.asignarResponsableDepartamento(nuevo, responsable);
         } else {
-            // edición: reemplazamos el objeto en la lista buscando por nombreOriginal
-            for (int i = 0; i < sistema.getDepartamentos().size(); i++) {
-                Departamento d = sistema.getDepartamentos().get(i);
-                if (d.getNombre().equals(nombreOriginal)) {
-                    sistema.getDepartamentos().set(i, nuevo);
-                    break;
-                }
-            }
+            // EDICIÓN IN-PLACE: actualizamos el mismo objeto (no reemplazamos)
+            departamento.setNombre(nombre);
+            departamento.setPresupuesto(presupuesto);
+
+            // sincronizamos responsable y la referencia en el empleado
+            sistema.asignarResponsableDepartamento(departamento, responsable);
         }
 
         guardado = true;
         dispose();
     }
-
     private void mostrarError(String mensaje) {
         JOptionPane.showMessageDialog(this, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
     }

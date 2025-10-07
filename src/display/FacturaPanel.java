@@ -4,6 +4,7 @@ import javax.swing.*;
 import java.awt.*;
 
 import display.dialog.FacturaDialog;
+import display.dialog.PagoDialog;
 import model.*;
 import display.table.FacturaTableModel;
 import service.FacturaPDFService;
@@ -35,18 +36,21 @@ public class FacturaPanel extends JPanel {
         JButton btnEliminar = crearBoton("Eliminar Factura", Color.decode("#DC143C"));
         JButton btnActualizar = crearBoton("Actualizar", Color.decode("#696969"));
         JButton btnVerDetalle = crearBoton("Ver Detalle", Color.decode("#FF8C00"));
+        JButton btnPagar = crearBoton("Pagar Factura", Color.decode("#FFD700"));
 
         btnAgregar.addActionListener(e -> agregarFactura());
         btnEditar.addActionListener(e -> editarFactura());
         btnEliminar.addActionListener(e -> eliminarFactura());
         btnActualizar.addActionListener(e -> cargarFacturas());
         btnVerDetalle.addActionListener(e -> verDetalleFactura());
+        btnPagar.addActionListener(e -> pagarFactura());
 
         panel.add(btnAgregar);
         panel.add(btnEditar);
         panel.add(btnEliminar);
         panel.add(btnActualizar);
         panel.add(btnVerDetalle);
+        panel.add(btnPagar);
 
         return panel;
     }
@@ -146,11 +150,16 @@ public class FacturaPanel extends JPanel {
     }
 
     // Métodos de datos
-    public void cargarFacturas() {
+    private void cargarFacturas() {
         tableModel.setRowCount(0);
 
         for (Factura factura : sistema.getFacturas()) {
-            String estado = factura.getPago() != null ? factura.getPago().getEstado().toString() : "SIN PAGO";
+            String estado = "SIN PAGO"; // Estado por defecto
+
+            if (factura.getPago() != null) {
+                // Solo mostrar estado del pago si existe
+                estado = factura.getPago().getEstado().toString();
+            }
 
             Object[] rowData = {
                     factura.getNumero(),
@@ -163,13 +172,29 @@ public class FacturaPanel extends JPanel {
                     String.format("%.1f%%", factura.getDescuento()),
                     String.format("%.1f%%", factura.getImpuestoExtra()),
                     String.format("$%,.2f", factura.calcularTotal()),
-                    estado
+                    estado  // Usar el estado calculado
             };
             tableModel.addRow(rowData);
         }
+    }
+    private void pagarFactura() {
+        int selectedRow = facturasTable.getSelectedRow();
+        if (selectedRow == -1) {
+            mostrarAdvertencia("Por favor seleccione una factura para pagar");
+            return;
+        }
 
-        if (tableModel.getRowCount() > 0) {
-            setupTableColumns();
+        String numero = (String) tableModel.getValueAt(selectedRow, 0);
+        Factura factura = buscarFacturaPorNumero(numero);
+
+        if (factura != null) {
+            PagoDialog dialog = new PagoDialog((Frame) SwingUtilities.getWindowAncestor(this), sistema, factura);
+            dialog.setVisible(true);
+
+            if (dialog.isGuardado()) {
+                cargarFacturas();
+                mostrarExito("Pago actualizado exitosamente");
+            }
         }
     }
 

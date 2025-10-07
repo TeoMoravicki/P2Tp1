@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.Date;
+import java.util.Locale;
 
 import display.FacturaPanel;
 import model.*;
@@ -262,7 +263,7 @@ public class FacturaDialog extends JDialog {
                     itemSeleccionado instanceof Producto ? "PRODUCTO" : "SERVICIO",
                     itemSeleccionado.getCodigo(),
                     itemSeleccionado.getNombre(),
-                    String.format("$%,.2f", itemSeleccionado.getPrecio())
+                    String.format(Locale.US, "$%,.2f", itemSeleccionado.getPrecio())
             };
             itemsTableModel.addRow(rowData);
             actualizarResumen();
@@ -288,19 +289,30 @@ public class FacturaDialog extends JDialog {
         double descuento = totalBruto * (descuentoPorcentaje / 100);
         double total = totalBruto - descuento;
 
-        lblSubtotal.setText(String.format("$%,.2f", subtotal));
-        lblIVA.setText(String.format("$%,.2f", iva));
-        lblImpuestoExtra.setText(String.format("$%,.2f", impuestoExtra));
-        lblDescuento.setText(String.format("$%,.2f", descuento));
-        lblTotal.setText(String.format("$%,.2f", total));
+        // Usar Locale.US para asegurar el formato correcto (punto decimal, coma para miles)
+        lblSubtotal.setText(String.format(Locale.US, "$%,.2f", subtotal));
+        lblIVA.setText(String.format(Locale.US, "$%,.2f", iva));
+        lblImpuestoExtra.setText(String.format(Locale.US, "$%,.2f", impuestoExtra));
+        lblDescuento.setText(String.format(Locale.US, "$%,.2f", descuento));
+        lblTotal.setText(String.format(Locale.US, "$%,.2f", total));
     }
 
     private double calcularSubtotal() {
         double subtotal = 0;
         for (int i = 0; i < itemsTableModel.getRowCount(); i++) {
             String precioStr = (String) itemsTableModel.getValueAt(i, 3);
-            double precio = Double.parseDouble(precioStr.replace("$", "").replace(",", ""));
-            subtotal += precio;
+            // Manejar correctamente el formato de moneda
+            String numeroLimpio = precioStr.replace("$", "")
+                    .replace(",", "")
+                    .replace(" ", "")
+                    .trim();
+            try {
+                double precio = Double.parseDouble(numeroLimpio);
+                subtotal += precio;
+            } catch (NumberFormatException e) {
+                System.err.println("Error parseando precio: " + precioStr);
+                // Puedes mostrar un mensaje de error o simplemente ignorar esta fila
+            }
         }
         return subtotal;
     }
@@ -401,17 +413,19 @@ public class FacturaDialog extends JDialog {
                 }
             }
 
+// Crear pago si no existe - SOLO para nuevas facturas
             if (facturaGuardar.getPago() == null) {
+                // Para nuevas facturas, crear pago con monto 0 y estado PENDIENTE
                 Pago pago = new Pago(
-                        facturaGuardar.calcularTotal(),
+                        0.0,  // Monto inicial 0
                         new Date(),
                         facturaGuardar.getFormaPago(),
-                        EstadoPago.PENDIENTE
+                        EstadoPago.PENDIENTE  // Estado inicial PENDIENTE
                 );
                 facturaGuardar.setPago(pago);
-            } else {
-                facturaGuardar.getPago().setMonto(facturaGuardar.calcularTotal());
             }
+// NO actualizar el monto automáticamente para facturas existentes
+// El pago se gestionará a través del diálogo de pagos
 
             if (factura == null) {
                 sistema.agregarFactura(facturaGuardar);

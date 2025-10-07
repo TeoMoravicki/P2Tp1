@@ -1,2 +1,2 @@
 package enums;
-public enum EstadoPago { PENDIENTE, CANCELADO, PARCIAL }
+public enum EstadoPago { PENDIENTE, CANCELADO, PARCIAL, PAGADO }

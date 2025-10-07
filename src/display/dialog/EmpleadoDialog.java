@@ -163,10 +163,10 @@ public class EmpleadoDialog extends JDialog {
             double salario = Double.parseDouble(txtSalario.getText().trim());
             PuestoEmpleado puesto = (PuestoEmpleado) cmbPuesto.getSelectedItem();
             Date fechaIngreso = (Date) spinnerFechaIngreso.getValue();
-            Departamento departamento = (Departamento) cmbDepartamento.getSelectedItem();
+            Departamento departamentoSeleccionado = (Departamento) cmbDepartamento.getSelectedItem();
 
             if (empleado == null) {
-                // crear nuevo
+                // Crear nuevo empleado
                 Empleado nuevoEmpleado = new Empleado(
                         nombre,
                         domicilio,
@@ -175,19 +175,28 @@ public class EmpleadoDialog extends JDialog {
                         salario,
                         puesto,
                         fechaIngreso,
-                        departamento
+                        departamentoSeleccionado
                 );
                 sistema.agregarEmpleado(nuevoEmpleado);
+
             } else {
-                // edición in-place usando setters (mantiene referencias)
+                // Guardar cambios in-place
                 empleado.setNombre(nombre);
                 empleado.setDomicilio(domicilio);
-                // DNI no se modifica
                 empleado.setTelefono(telefono);
                 empleado.setSalario(salario);
                 empleado.setPuesto(puesto);
                 empleado.setFechaIngreso(fechaIngreso);
-                empleado.setDepartamento(departamento);
+
+                Departamento anterior = empleado.getDepartamento();
+                empleado.setDepartamento(departamentoSeleccionado);
+
+                // Si cambió de departamento y era responsable, actualizamos el viejo departamento
+                if (anterior != null && anterior != departamentoSeleccionado) {
+                    if (anterior.getResponsable() == empleado) {
+                        anterior.setResponsable(null);
+                    }
+                }
             }
 
             guardado = true;
