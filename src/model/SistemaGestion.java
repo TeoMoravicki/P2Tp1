@@ -94,4 +94,30 @@ public class SistemaGestion {
     public void agregarFactura(Factura factura) {
         facturas.add(factura);
     }
+    public boolean asignarResponsableDepartamento(Departamento departamento, Empleado nuevoResponsable) {
+        if (departamento == null) return false;
+
+        Empleado anterior = departamento.getResponsable();
+        departamento.setResponsable(nuevoResponsable);
+
+        // Actualizamos referencia del empleado responsable
+        if (nuevoResponsable != null) {
+            nuevoResponsable.setDepartamento(departamento);
+            if (!empleados.contains(nuevoResponsable)) {
+                empleados.add(nuevoResponsable);
+            }
+        }
+
+        // Si el anterior responsable ya no es el mismo, podés limpiar su referencia si querés
+    /*
+    if (anterior != null && anterior != nuevoResponsable) {
+        if (Objects.equals(anterior.getDepartamento(), departamento)) {
+            anterior.setDepartamento(null);
+        }
+    }
+    */
+
+        return true;
+    }
+
 }

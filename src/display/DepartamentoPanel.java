@@ -82,31 +82,6 @@ public class DepartamentoPanel extends JPanel {
     }
 
 
-    private boolean validarYGuardarDepartamento(String nombre, String presupuesto, Empleado responsable) {
-        if (nombre == null || nombre.trim().isEmpty()) {
-            mostrarError("El nombre es obligatorio");
-            return false;
-        }
-
-        try {
-            double presupuestoVal = Double.parseDouble(presupuesto);
-            if (presupuestoVal < 0) {
-                mostrarError("El presupuesto no puede ser negativo");
-                return false;
-            }
-
-            Departamento nuevoDepartamento = new Departamento(nombre.trim(), presupuestoVal, responsable);
-            sistema.agregarDepartamento(nuevoDepartamento);
-            cargarDepartamentos();
-            mostrarExito("Departamento creado exitosamente");
-            return true;
-
-        } catch (NumberFormatException e) {
-            mostrarError("El presupuesto debe ser un número válido");
-            return false;
-        }
-    }
-
     private void editarDepartamento() {
         int selectedRow = departamentosTable.getSelectedRow();
         if (selectedRow == -1) {

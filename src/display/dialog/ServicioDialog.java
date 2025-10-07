@@ -90,8 +90,8 @@ public class ServicioDialog extends JDialog {
         formPanel.add(cmbProveedor, gbc);
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        JButton btnGuardar = crearBoton("💾 Guardar", Color.decode("#2E8B57"));
-        JButton btnCancelar = crearBoton("❌ Cancelar", Color.decode("#DC143C"));
+        JButton btnGuardar = crearBoton("Guardar", Color.decode("#2E8B57"));
+        JButton btnCancelar = crearBoton("Cancelar", Color.decode("#DC143C"));
 
         btnGuardar.addActionListener(e -> {
             if (validarFormulario()) {
