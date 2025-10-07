@@ -28,8 +28,8 @@ public class SistemaGestion {
                 "smtp.gmail.com",          // host
                 "587",                     // port
                 "teobenjaminmoravicki@gmail.com",      // user
-                "buii ukwi xrom xvls",             // pass
-                true                      // prod-test
+                "rulul",             // pass
+                false                      // prod-test
         );
 
         cargarDatosEjemplo();
