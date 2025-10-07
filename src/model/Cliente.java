@@ -17,7 +17,6 @@ public class Cliente extends Persona {
         this.historialCompras = new ArrayList<>();
     }
 
-
     public void agregarFactura(Factura factura) {
         historialCompras.add(factura);
     }
@@ -25,4 +24,13 @@ public class Cliente extends Persona {
     public double getLimiteCredito() { return limiteCredito; }
     public CategoriaCliente getCategoria() { return categoria; }
     public List<Factura> getHistorialCompras() { return historialCompras; }
+
+    // Setters para edición en sitio
+    public void setLimiteCredito(double limiteCredito) { this.limiteCredito = limiteCredito; }
+    public void setCategoria(CategoriaCliente categoria) { this.categoria = categoria; }
+
+    @Override
+    public String toString() {
+        return nombre;
+    }
 }

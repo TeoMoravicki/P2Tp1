@@ -1,13 +1,14 @@
 package model;
+
 import enums.EstadoPago;
 import enums.FormaPago;
-
 import java.util.Date;
+
 public class Pago {
-    private final double monto;
-    private final Date fecha;
-    private final FormaPago formaPago;
-    private final EstadoPago estado;
+    private double monto;
+    private Date fecha;
+    private FormaPago formaPago;
+    private EstadoPago estado;
 
     public Pago(double monto, Date fecha, FormaPago formaPago, EstadoPago estado) {
         this.monto = monto;
@@ -16,9 +17,25 @@ public class Pago {
         this.estado = estado;
     }
 
-
     public double getMonto() { return monto; }
+    public void setMonto(double monto) { this.monto = monto; }
+
     public Date getFecha() { return fecha; }
+    public void setFecha(Date fecha) { this.fecha = fecha; }            // <-- agregado
+
     public FormaPago getFormaPago() { return formaPago; }
+    public void setFormaPago(FormaPago formaPago) { this.formaPago = formaPago; } // <-- agregado
+
     public EstadoPago getEstado() { return estado; }
+    public void setEstado(EstadoPago estado) { this.estado = estado; }
+
+    @Override
+    public String toString() {
+        return "Pago{" +
+                "monto=" + monto +
+                ", fecha=" + fecha +
+                ", formaPago=" + formaPago +
+                ", estado=" + estado +
+                '}';
+    }
 }
