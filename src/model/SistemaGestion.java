@@ -2,6 +2,7 @@ package model;
 
 import java.util.*;
 import enums.*;
+import service.EmailService;
 
 public class SistemaGestion {
     private List<Departamento> departamentos;
@@ -11,6 +12,7 @@ public class SistemaGestion {
     private List<Producto> productos;
     private List<Servicio> servicios;
     private List<Factura> facturas;
+    private EmailService emailService;
 
     public SistemaGestion() {
         this.departamentos = new ArrayList<>();
@@ -20,6 +22,16 @@ public class SistemaGestion {
         this.productos = new ArrayList<>();
         this.servicios = new ArrayList<>();
         this.facturas = new ArrayList<>();
+
+        // Inicializar el servicio de email (configuración para desarrollo)
+        this.emailService = new EmailService(
+                "smtp.gmail.com",          // host
+                "587",                     // port
+                "teobenjaminmoravicki@gmail.com",      // user
+                "buii ukwi xrom xvls",             // pass
+                true                      // prod-test
+        );
+
         cargarDatosEjemplo();
     }
 
@@ -41,9 +53,9 @@ public class SistemaGestion {
                 "TecnoSuministros S.A.", "A12345678");
         proveedores.add(proveedor1);
 
-        // Crear cliente
+        // Crear cliente CON EMAIL
         Cliente cliente1 = new Cliente("María López", "Calle Secundaria 789", "11223344", "555-1122",
-                10000, CategoriaCliente.PREMIUM);
+                10000, CategoriaCliente.PREMIUM, "teobenjaminmoravicki@gmail.com");
         clientes.add(cliente1);
 
         // Crear producto
@@ -55,16 +67,53 @@ public class SistemaGestion {
         Servicio servicio1 = new Servicio("S001", "Mantenimiento anual", 500,
                 TipoProductoServicio.SERVICIO_TECNICO, proveedor1);
         servicios.add(servicio1);
+
+        // Crear una factura de ejemplo (sin pago inicial)
+        Factura facturaEjemplo = new Factura(
+                "F-001",
+                new Date(),
+                cliente1,
+                empleado1,
+                FormaPago.TARJETA
+        );
+        facturaEjemplo.agregarItem(producto1);
+        facturaEjemplo.agregarItem(servicio1);
+        facturas.add(facturaEjemplo);
     }
 
     // Getters para las listas
-    public List<Departamento> getDepartamentos() { return departamentos; }
-    public List<Empleado> getEmpleados() { return empleados; }
-    public List<Proveedor> getProveedores() { return proveedores; }
-    public List<Cliente> getClientes() { return clientes; }
-    public List<Producto> getProductos() { return productos; }
-    public List<Servicio> getServicios() { return servicios; }
-    public List<Factura> getFacturas() { return facturas; }
+    public List<Departamento> getDepartamentos() {
+        return new ArrayList<>(departamentos);
+    }
+
+    public List<Empleado> getEmpleados() {
+        return new ArrayList<>(empleados);
+    }
+
+    public List<Proveedor> getProveedores() {
+        return new ArrayList<>(proveedores);
+    }
+
+    public List<Cliente> getClientes() {
+        return new ArrayList<>(clientes);
+    }
+
+    public List<Producto> getProductos() {
+        return new ArrayList<>(productos);
+    }
+
+    public List<Servicio> getServicios() {
+        return new ArrayList<>(servicios);
+    }
+
+    public List<Factura> getFacturas() {
+        return new ArrayList<>(facturas);
+    }
+
+    // Getter para el servicio de email
+    public EmailService getEmailService() {
+        return emailService;
+    }
 
     // Métodos para agregar elementos
     public void agregarDepartamento(Departamento departamento) {
@@ -94,6 +143,7 @@ public class SistemaGestion {
     public void agregarFactura(Factura factura) {
         facturas.add(factura);
     }
+
     public boolean asignarResponsableDepartamento(Departamento departamento, Empleado nuevoResponsable) {
         if (departamento == null) return false;
 
@@ -108,16 +158,82 @@ public class SistemaGestion {
             }
         }
 
-        // Si el anterior responsable ya no es el mismo, podés limpiar su referencia si querés
-    /*
-    if (anterior != null && anterior != nuevoResponsable) {
-        if (Objects.equals(anterior.getDepartamento(), departamento)) {
-            anterior.setDepartamento(null);
-        }
-    }
-    */
-
         return true;
     }
 
+    // Métodos de búsqueda útiles
+    public Cliente buscarClientePorDNI(String dni) {
+        return clientes.stream()
+                .filter(cliente -> cliente.getDni().equals(dni))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Empleado buscarEmpleadoPorDNI(String dni) {
+        return empleados.stream()
+                .filter(empleado -> empleado.getDni().equals(dni))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Proveedor buscarProveedorPorDNI(String dni) {
+        return proveedores.stream()
+                .filter(proveedor -> proveedor.getDni().equals(dni))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Producto buscarProductoPorCodigo(String codigo) {
+        return productos.stream()
+                .filter(producto -> producto.getCodigo().equals(codigo))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Servicio buscarServicioPorCodigo(String codigo) {
+        return servicios.stream()
+                .filter(servicio -> servicio.getCodigo().equals(codigo))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public Factura buscarFacturaPorNumero(String numero) {
+        return facturas.stream()
+                .filter(factura -> factura.getNumero().equals(numero))
+                .findFirst()
+                .orElse(null);
+    }
+
+    // Método para configurar el servicio de email en producción
+    public void configurarEmailService(String host, String port, String username, String password, boolean enabled) {
+        this.emailService = new EmailService(host, port, username, password, enabled);
+    }
+
+    // Método para verificar si hay datos mínimos para crear facturas
+    public boolean puedeCrearFacturas() {
+        return !clientes.isEmpty() &&
+                !empleados.isEmpty() &&
+                (!productos.isEmpty() || !servicios.isEmpty());
+    }
+
+    // Método para obtener estadísticas del sistema
+    public Map<String, Integer> obtenerEstadisticas() {
+        Map<String, Integer> stats = new HashMap<>();
+        stats.put("departamentos", departamentos.size());
+        stats.put("empleados", empleados.size());
+        stats.put("proveedores", proveedores.size());
+        stats.put("clientes", clientes.size());
+        stats.put("productos", productos.size());
+        stats.put("servicios", servicios.size());
+        stats.put("facturas", facturas.size());
+
+        // Calcular facturas pagadas vs pendientes
+        long facturasPagadas = facturas.stream()
+                .filter(f -> f.getPago() != null && f.getPago().getEstado() == EstadoPago.PAGADO)
+                .count();
+        stats.put("facturasPagadas", (int) facturasPagadas);
+        stats.put("facturasPendientes", facturas.size() - (int) facturasPagadas);
+
+        return stats;
+    }
 }

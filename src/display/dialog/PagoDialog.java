@@ -256,13 +256,82 @@ public class PagoDialog extends JDialog {
                 }
 
                 guardado = true;
+                if (guardado) {
+                    enviarNotificacionPago(factura, montoAdicional, montoTotal, estado);
+                }
                 dispose();
+
 
             } catch (NumberFormatException e) {
                 mostrarError("El monto adicional debe ser un número válido");
             }
         }
     }
+
+    private void enviarNotificacionPago(Factura factura, double montoAdicional, double montoTotal, EstadoPago estado) {
+        try {
+            String emailCliente = factura.getCliente().getEmail();
+
+            if (emailCliente == null || emailCliente.trim().isEmpty()) {
+                System.out.println("⚠️ Cliente no tiene email registrado. No se enviará notificación.");
+                return;
+            }
+
+            String asunto = "Notificación de Pago - Factura #" + factura.getNumero();
+            String mensaje = construirMensajeEmail(factura, montoAdicional, montoTotal, estado);
+
+            // Enviar email a través del sistema
+            sistema.getEmailService().enviarNotificacionPago(emailCliente, asunto, mensaje);
+
+            // Mostrar confirmación al usuario
+            JOptionPane.showMessageDialog(this,
+                    "✅ Pago registrado y notificación enviada al cliente",
+                    "Notificación Enviada",
+                    JOptionPane.INFORMATION_MESSAGE);
+
+        } catch (Exception e) {
+            System.err.println("Error enviando notificación: " + e.getMessage());
+            // No mostrar error al usuario para no interrumpir el flujo principal
+        }
+    }
+
+    private String construirMensajeEmail(Factura factura, double montoAdicional, double montoTotal, EstadoPago estado) {
+        StringBuilder mensaje = new StringBuilder();
+
+        mensaje.append("Estimado/a ").append(factura.getCliente().getNombre()).append(",\n\n");
+        mensaje.append("Le informamos que se ha registrado un pago para su factura.\n\n");
+
+        mensaje.append("📋 DETALLES DE LA FACTURA:\n");
+        mensaje.append("────────────────────────────\n");
+        mensaje.append("Número: ").append(factura.getNumero()).append("\n");
+        mensaje.append("Fecha Emisión: ").append(factura.getFechaEmision()).append("\n");
+        mensaje.append("Cliente: ").append(factura.getCliente().getNombre()).append("\n");
+        mensaje.append("Total Factura: $").append(String.format("%,.2f", factura.calcularTotal())).append("\n\n");
+
+        mensaje.append("💳 DETALLES DEL PAGO:\n");
+        mensaje.append("────────────────────────────\n");
+        mensaje.append("Monto del pago actual: $").append(String.format("%,.2f", montoAdicional)).append("\n");
+        mensaje.append("Monto total pagado: $").append(String.format("%,.2f", montoTotal)).append("\n");
+        mensaje.append("Saldo pendiente: $").append(String.format("%,.2f", factura.calcularTotal() - montoTotal)).append("\n");
+        mensaje.append("Estado: ").append(estado.toString()).append("\n");
+        mensaje.append("Forma de Pago: ").append(factura.getFormaPago().toString()).append("\n\n");
+
+        if (estado == EstadoPago.PAGADO) {
+            mensaje.append("🎉 ¡SU FACTURA HA SIDO COMPLETAMENTE PAGADA!\n\n");
+        } else if (estado == EstadoPago.PARCIAL) {
+            mensaje.append("📝 Recordatorio: Aún tiene un saldo pendiente.\n\n");
+        }
+
+        mensaje.append("Gracias por su preferencia.\n");
+        mensaje.append("Atentamente,\n");
+        mensaje.append("El equipo de facturación\n\n");
+
+        mensaje.append("---\n");
+        mensaje.append("Este es un mensaje automático, por favor no responda a este correo.");
+
+        return mensaje.toString();
+    }
+
     private boolean validarFormulario() {
         // Validar monto adicional
         if (txtMontoAdicional.getText().trim().isEmpty()) {

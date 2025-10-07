@@ -17,6 +17,8 @@ public class ClienteDialog extends JDialog {
     private JTextField txtTelefono;
     private JTextField txtLimiteCredito;
     private JComboBox<CategoriaCliente> cmbCategoria;
+    private JTextField txtEmail = new JTextField(20);
+
 
     public ClienteDialog(Frame owner, SistemaGestion sistema, Cliente clienteExistente) {
         super(owner, clienteExistente == null ? "Agregar Cliente" : "Editar Cliente", true);
@@ -73,6 +75,12 @@ public class ClienteDialog extends JDialog {
         gbc.gridx = 1;
         formPanel.add(cmbCategoria, gbc);
 
+        gbc.gridx = 0; gbc.gridy = 6;  // Ajusta el número según tu layout
+        formPanel.add(new JLabel("Email:"), gbc);
+        gbc.gridx = 1;
+        formPanel.add(txtEmail, gbc);
+
+
         JPanel buttonPanel = new JPanel(new FlowLayout());
         JButton btnGuardar = crearBoton("Guardar", Color.decode("#2E8B57"));
         JButton btnCancelar = crearBoton("Cancelar", Color.decode("#DC143C"));
@@ -105,14 +113,14 @@ public class ClienteDialog extends JDialog {
         if (validarFormulario()) {
             try {
                 if (cliente == null) {
-                    // Nuevo cliente
-                    Cliente clienteGuardar = new Cliente(
+                   Cliente clienteGuardar = new Cliente(
                             txtNombre.getText().trim(),
                             txtDomicilio.getText().trim(),
                             txtDNI.getText().trim(),
                             txtTelefono.getText().trim(),
                             Double.parseDouble(txtLimiteCredito.getText().trim()),
-                            (CategoriaCliente) cmbCategoria.getSelectedItem()
+                            (CategoriaCliente) cmbCategoria.getSelectedItem(),
+                            txtEmail.getText().trim()  // Nuevo campo
                     );
                     sistema.agregarCliente(clienteGuardar);
                 } else {
@@ -123,6 +131,7 @@ public class ClienteDialog extends JDialog {
                     cliente.setTelefono(txtTelefono.getText().trim());
                     cliente.setLimiteCredito(Double.parseDouble(txtLimiteCredito.getText().trim()));
                     cliente.setCategoria((CategoriaCliente) cmbCategoria.getSelectedItem());
+                    cliente.setEmail(txtEmail.getText().trim());
                 }
 
                 guardado = true;
