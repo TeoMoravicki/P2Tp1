@@ -1,70 +1,76 @@
 package model;
-import enums.FormaPago;
 
+import enums.FormaPago;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class Factura {
-    private final String numero;
-    private final Date fechaEmision;
-    private final Cliente cliente;
-    private final Empleado empleado;
-    private final List<ItemComercial> items;
-    private final FormaPago formaPago;
+
+    private String numero;
+    private Date fechaEmision;
+    private Cliente cliente;
+    private Empleado empleado;
+    private FormaPago formaPago;
+    private List<ItemComercial> items;
+    private double descuento;         // en porcentaje (0 a 100)
+    private double impuestoExtra;     // en porcentaje (0 a 100)
     private Pago pago;
 
-    public Factura(String numero, Date fechaEmision, Cliente cliente,
-                   Empleado empleado, FormaPago formaPago) {
+    public Factura(String numero, Date fechaEmision, Cliente cliente, Empleado empleado, FormaPago formaPago) {
         this.numero = numero;
         this.fechaEmision = fechaEmision;
         this.cliente = cliente;
         this.empleado = empleado;
         this.formaPago = formaPago;
         this.items = new ArrayList<>();
-        this.cliente.agregarFactura(this);
-    }
-
-
-    public void agregarItem(ItemComercial item) {
-        items.add(item);
-    }
-
-    public void setPago(Pago pago) {
-        this.pago = pago;
-    }
-
-    public double calcularTotal() {
-        double total = 0;
-        for (ItemComercial item : items) {
-            total += item.getPrecio();
-        }
-        return total;
-    }
-
-    public void mostrarDetalle() {
-        System.out.println("=== FACTURA #" + numero + " ===");
-        System.out.println("Fecha: " + fechaEmision);
-        System.out.println("Cliente: " + cliente.getNombre() + " (" + cliente.getCategoria() + ")");
-        System.out.println("Empleado: " + empleado.getNombre() + " (" + empleado.getPuesto() + ")");
-        System.out.println("Departamento: " + empleado.getDepartamento().getNombre());
-        System.out.println("\nITEMS:");
-        for (ItemComercial item : items) {
-            System.out.println("- " + item.getNombre() + ": $" + item.getPrecio());
-        }
-        System.out.println("\nTotal: $" + calcularTotal());
-        System.out.println("Forma de pago: " + formaPago);
-        if (pago != null) {
-            System.out.println("Estado de pago: " + pago.getEstado());
-        }
-        System.out.println("=============================");
+        this.descuento = 0.0;
+        this.impuestoExtra = 0.0;
     }
 
     public String getNumero() { return numero; }
     public Date getFechaEmision() { return fechaEmision; }
     public Cliente getCliente() { return cliente; }
     public Empleado getEmpleado() { return empleado; }
-    public List<ItemComercial> getItems() { return items; }
     public FormaPago getFormaPago() { return formaPago; }
+    public List<ItemComercial> getItems() { return items; }
     public Pago getPago() { return pago; }
+
+    public void setPago(Pago pago) { this.pago = pago; }
+
+    public double getDescuento() { return descuento; }
+    public void setDescuento(double descuento) { this.descuento = descuento; }
+
+    public double getImpuestoExtra() { return impuestoExtra; }
+    public void setImpuestoExtra(double impuestoExtra) { this.impuestoExtra = impuestoExtra; }
+
+    public double calcularSubtotal() {
+        double sub = 0.0;
+        for (ItemComercial item : items) {
+            sub += item.getPrecio();
+        }
+        return sub;
+    }
+
+    public double calcularImpuestos() {
+        return calcularSubtotal() * 0.21;
+    }
+
+    public double calcularImpuestoExtra() {
+        return calcularSubtotal() * (impuestoExtra / 100.0);
+    }
+
+    public double calcularTotal() {
+        double subtotal = calcularSubtotal();
+        double iva = calcularImpuestos();
+        double extra = calcularImpuestoExtra();
+        double bruto = subtotal + iva + extra;
+        double descuentoAplicado = bruto * (descuento / 100.0);
+        return bruto - descuentoAplicado;
+    }
+
+
+    public void agregarItem(ItemComercial item) {
+        items.add(item);
+    }
 }

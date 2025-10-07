@@ -47,13 +47,13 @@ public class MenuManager {
             System.out.println("5. Gestionar Productos");
             System.out.println("6. Gestionar Servicios");
             System.out.println("7. Gestionar Facturas");
-            System.out.println("8. Mostrar todas las facturas");
+            System.out.println("8. Imprimir TODAS las facturas (PDF)");
             System.out.println("0. Salir");
             System.out.print("Seleccione una opción: ");
 
             try {
                 opcion = scanner.nextInt();
-                scanner.nextLine(); // limpiar buffer
+                scanner.nextLine();
 
                 switch (opcion) {
                     case 1 -> departamentoService.gestionar();
@@ -63,13 +63,13 @@ public class MenuManager {
                     case 5 -> productoService.gestionar();
                     case 6 -> servicioService.gestionar();
                     case 7 -> facturaService.gestionar();
-                    case 8 -> facturaService.mostrarTodas();
+                    case 8 -> facturaService.imprimirTodasPdf(); // << cambio
                     case 0 -> System.out.println("Saliendo del sistema...");
                     default -> System.out.println("Opción no válida. Intente nuevamente.");
                 }
             } catch (InputMismatchException e) {
                 System.out.println("Por favor, ingrese un número válido.");
-                scanner.nextLine(); // limpiar buffer
+                scanner.nextLine();
             }
         }
     }
